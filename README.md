@@ -41,3 +41,27 @@
 
 ---
 
+## 🏗️ Arquitectura
+
+- Arquitectura **cliente-servidor con microservicios**.  
+- Backend como **API Gateway**.  
+- Estilo **Hexagonal / Ports & Adapters**:
+  - Cada integración externa (DB, Maps, Medata, ML) aislada mediante su propio DAO.
+
+---
+
+## ⚙️ CI/CD y Despliegue (En Desarrollo)
+
+- **CI/CD con GitHub Actions**
+  - Ejecuta test y build en cada push.
+  - Despliegues automáticos por módulo.
+
+### Servicios Gratuitos a usar con la gestion en la nube:
+- **Frontend:** Vercel  
+- **Backend:** Render (Version Gratuita)  
+- **ML Service:** Render (Version Gratuita)  
+- **Base de Datos:** Neon (PostgreSQL en la nube)
+
+Render hace **auto-deploy** cuando se realiza un push al repositorio.
+
+---
