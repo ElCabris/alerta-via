@@ -1,0 +1,197 @@
+# ======================================
+# Angular / Node.js
+# ======================================
+dist/
+tmp/
+out-tsc/
+bazel-out/
+build/
+.angular/
+.angular/cache
+.sass-cache/
+connect.lock
+coverage/
+libpeerconnection.log
+npm-debug.log*
+yarn-error.log
+testem.log
+typings/
+e2e/*.js
+e2e/*.map
+
+# Dependencies
+node_modules/
+bower_components/
+jspm_packages/
+web_modules/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.yarn-integrity
+.pnp.*
+package-lock.json
+yarn.lock
+
+# ======================================
+# Python
+# ======================================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+.dmypy.json
+dmypy.json
+.mypy_cache/
+.pyre/
+.pytype/
+
+# Django / Flask / DB
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+instance/
+.webassets-cache
+
+# Jupyter / IPython
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+
+# Poetry / Pipenv
+poetry.toml
+#Pipfile.lock
+#poetry.lock
+.pdm.toml
+__pypackages__/
+
+# ======================================
+# Logs & Runtime Data
+# ======================================
+logs/
+*.log
+lerna-debug.log*
+.pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+*.stackdump
+report.*.json
+
+# ======================================
+# Environment Files
+# ======================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+
+# ======================================
+# IDEs & Editors
+# ======================================
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.vscode-test/
+.history/
+.ionide
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+
+# ======================================
+# OS-Specific
+# ======================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.icloud
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# ======================================
+# Miscellaneous
+# ======================================
+*.tgz
+*.vsix
+.site
+/angular/cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+/typings
