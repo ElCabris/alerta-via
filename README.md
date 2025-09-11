@@ -41,7 +41,7 @@
 
 ---
 
-## 🏗️ Arquitectura
+## Arquitectura 🏗️
 
 - Arquitectura **cliente-servidor con microservicios**.  
 - Backend como **API Gateway**.  
@@ -50,7 +50,7 @@
 
 ---
 
-## ⚙️ CI/CD y Despliegue (En Desarrollo)
+## CI/CD y Despliegue (En Desarrollo) ⚙️
 
 - **CI/CD con GitHub Actions**
   - Ejecuta test y build en cada push.
