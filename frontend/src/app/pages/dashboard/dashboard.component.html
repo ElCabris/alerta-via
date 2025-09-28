@@ -1,0 +1,128 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-left">
+      <img src="/Logo.webp" alt="AlertVia Logo" class="header-logo">
+      <h1 class="app-title">AlertVia</h1>
+    </div>
+    <div class="header-right">
+      <button class="profile-btn" routerLink="/perfil">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+          <path d="M12 14c-4.42 0-8 2.69-8 6v2h16v-2c0-3.31-3.58-6-8-6z"/>
+        </svg>
+        Mi Perfil
+      </button>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <aside class="control-panel">
+      <div class="panel-section">
+        <h2 class="section-title">Planifica tu Ruta Segura</h2>
+        
+        <div class="input-group">
+          <label for="origin">¿Dónde estoy?</label>
+          <div class="input-with-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+            </svg>
+            <input type="text" id="origin" placeholder="Ingresa tu ubicación actual">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="destination">¿A dónde voy?</label>
+          <div class="input-with-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
+            </svg>
+            <input type="text" id="destination" placeholder="Ingresa tu destino">
+          </div>
+        </div>
+
+        <button class="route-btn primary">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21.71 11.29l-9-9a1 1 0 0 0-1.42 0l-9 9a1 1 0 0 0 0 1.42l9 9a1 1 0 0 0 1.42 0l9-9a1 1 0 0 0 0-1.42zM14 14.5V12h-4v2.5l-2.5-2.5L10 8.5 12 11V8h4v3l2-2.5 2.5 2.5z"/>
+          </svg>
+          Trazar Ruta Segura
+        </button>
+      </div>
+
+      <div class="panel-section">
+        <h3 class="section-subtitle">Niveles de Riesgo</h3>
+        <div class="risk-levels">
+          <div class="risk-item low">
+            <div class="risk-indicator"></div>
+            <span>Riesgo Bajo</span>
+          </div>
+          <div class="risk-item medium">
+            <div class="risk-indicator"></div>
+            <span>Riesgo Medio</span>
+          </div>
+          <div class="risk-item high">
+            <div class="risk-indicator"></div>
+            <span>Riesgo Alto</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <h3 class="section-subtitle">Acciones Rápidas</h3>
+        <div class="action-buttons">
+          <button class="action-btn report">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+            </svg>
+            Reportar Incidente
+          </button>
+          <button class="action-btn stats">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/>
+            </svg>
+            Ver Estadísticas
+          </button>
+          <button class="action-btn profile">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+              <path d="M12 14c-4.42 0-8 2.69-8 6v2h16v-2c0-3.31-3.58-6-8-6z"/>
+            </svg>
+            Mi Perfil
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="map-container">
+      <div class="map-placeholder" id="map">
+        <div class="map-overlay">
+          <div class="map-info">
+            <h3>Mapa en Tiempo Real</h3>
+            <p>Visualizando rutas seguras y alertas viales</p>
+            <div class="map-stats">
+              <div class="stat">
+                <span class="stat-number">12</span>
+                <span class="stat-label">Alertas Activas</span>
+              </div>
+              <div class="stat">
+                <span class="stat-number">45</span>
+                <span class="stat-label">Usuarios Cerca</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="dashboard-footer">
+    <div class="footer-stats">
+      <div class="live-alert">
+        <span class="alert-dot"></span>
+        <span>Sistema Activo - Monitoreando 15.2km a la redonda</span>
+      </div>
+      <div class="update-time">
+        Última actualización: {{ currentTime }}
+      </div>
+    </div>
+  </footer>
+</div>
