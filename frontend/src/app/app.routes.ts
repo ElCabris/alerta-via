@@ -16,5 +16,13 @@ export const routes: Routes = [
   { 
     path: 'privacidad', 
     loadComponent: () => import('./pages/privacy/privacy.component').then(m => m.PrivacyComponent)
+  },
+  { 
+    path: 'dashboard', 
+    loadComponent: () => import('./pages/dashboard/dashboard.component').then(m => m.DashboardComponent)
+  },
+  { 
+    path: '**', 
+    redirectTo: '' 
   }
 ];

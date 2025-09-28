@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -17,6 +17,8 @@ export class RegisterComponent {
   confirmPassword: string = '';
   acceptTerms: boolean = false;
 
+  constructor(private router: Router) {}
+
   onSubmit() {
     console.log('Datos de registro:', {
       fullName: this.fullName,
@@ -25,7 +27,6 @@ export class RegisterComponent {
       confirmPassword: this.confirmPassword,
       acceptTerms: this.acceptTerms
     });
-
 
     if (this.password !== this.confirmPassword) {
       alert('Las contraseñas no coinciden');
@@ -39,6 +40,7 @@ export class RegisterComponent {
 
     if (this.fullName && this.email && this.password) {
       alert('Cuenta creada exitosamente');
+      this.router.navigate(['/dashboard']);
     }
   }
 }
