@@ -534,3 +534,41 @@
     gap: 1.5rem;
   }
 }
+
+/* Para la barra de scroll vertical */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #384d61;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c42c4d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ad2744;
+}
+
+/* Para la barra de scroll horizontal */
+::-webkit-scrollbar-horizontal {
+  height: 12px;
+}
+
+::-webkit-scrollbar-track-horizontal {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb-horizontal {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb-horizontal:hover {
+  background: #555;
+}
