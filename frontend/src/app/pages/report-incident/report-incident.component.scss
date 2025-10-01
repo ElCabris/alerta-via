@@ -101,6 +101,42 @@
       }
     }
 
+    // Estilos específicos para el select
+    select {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.08) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") no-repeat right 1rem center / 1em;
+      cursor: pointer;
+      padding-right: 3rem;
+      
+      // Para el texto de las opciones (cuando están desplegadas)
+      option {
+        background: #062139;
+        color: white;
+        padding: 0.5rem;
+      }
+
+
+      &:not(:invalid) {
+        color: white;
+        background: rgba(255, 255, 255, 0.08) url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e") no-repeat right 1rem center / 1em;
+      }
+
+
+      &:invalid {
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+
+      &::-webkit-select-placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      
+      
+      &::-moz-placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
     textarea {
       resize: vertical;
       min-height: 100px;
