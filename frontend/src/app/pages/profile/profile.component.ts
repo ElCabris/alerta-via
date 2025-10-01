@@ -11,13 +11,17 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent {
+  isEditing = false; // Agrega esta variable
+  
   user = {
     name: 'Juan Pérez',
-    email: 'juan@email.com',
-    phone: '+57 300 123 4567'
+    email: 'juan.perez@example.com',
+    phone: '+57 123 456 7890'
   };
-  
+
   onSubmit() {
+    // Tu lógica para guardar los cambios
     console.log('Perfil actualizado:', this.user);
+    this.isEditing = false; // Vuelve al modo visualización después de guardar
   }
 }

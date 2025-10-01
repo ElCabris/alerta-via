@@ -16,7 +16,30 @@
         <h2>{{ user.name }}</h2>
       </div>
 
-      <form class="profile-form" (ngSubmit)="onSubmit()">
+      <!-- Vista de visualización (por defecto) -->
+      <div class="profile-view" *ngIf="!isEditing">
+        <div class="profile-info">
+          <div class="info-group">
+            <label>Nombre Completo</label>
+            <p class="info-value">{{ user.name }}</p>
+          </div>
+
+          <div class="info-group">
+            <label>Correo Electrónico</label>
+            <p class="info-value">{{ user.email }}</p>
+          </div>
+
+          <div class="info-group">
+            <label>Teléfono</label>
+            <p class="info-value">{{ user.phone || 'No especificado' }}</p>
+          </div>
+        </div>
+
+        <button class="edit-btn" (click)="isEditing = true">Editar Perfil</button>
+      </div>
+
+      <!-- Vista de edición -->
+      <form class="profile-form" *ngIf="isEditing" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label for="name">Nombre Completo</label>
           <input type="text" id="name" [(ngModel)]="user.name" name="name" required>
@@ -29,10 +52,13 @@
 
         <div class="form-group">
           <label for="phone">Teléfono</label>
-          <input type="tel" id="phone" [(ngModel)]="user.phone" name="phone">
+          <input type="tel" id="phone" [(ngModel)]="user.phone" name="phone" placeholder="Ingresa tu teléfono">
         </div>
 
-        <button type="submit" class="submit-btn" routerLink="/dashboard">Actualizar Perfil</button>
+        <div class="form-actions">
+          <button type="button" class="cancel-btn" (click)="isEditing = false">Cancelar</button>
+          <button type="submit" class="submit-btn">Guardar Cambios</button>
+        </div>
       </form>
     </div>
   </div>
