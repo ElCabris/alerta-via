@@ -47,52 +47,52 @@
         </button>
       </div>
 
-    <div class="panel-section">
-  <h3 class="section-subtitle">Niveles de Riesgo</h3>
-  <div class="risk-levels">
-    <div class="risk-item low">
-      <div class="risk-indicator"></div>
-      <span>Riesgo Bajo</span>
-      <div class="simple-tooltip">
-        <strong>Riesgo Bajo detectado</strong>
-        <p>Posible posibilidad de robo</p>
+      <div class="panel-section">
+        <h3 class="section-subtitle">Niveles de Riesgo</h3>
+        <div class="risk-levels">
+          <div class="risk-item low">
+            <div class="risk-indicator"></div>
+            <span>Riesgo Bajo</span>
+            <div class="simple-tooltip">
+              <strong>Riesgo Bajo detectado</strong>
+              <p>Posible posibilidad de robo</p>
+            </div>
+          </div>
+          <div class="risk-item medium">
+            <div class="risk-indicator"></div>
+            <span>Riesgo Medio</span>
+            <div class="simple-tooltip">
+              <strong>Riesgo Medio detectado</strong>
+              <p>Robos ocasionales reportados</p>
+            </div>
+          </div>
+          <div class="risk-item high">
+            <div class="risk-indicator"></div>
+            <span>Riesgo Alto</span>
+            <div class="simple-tooltip">
+              <strong>Riesgo Alto detectado</strong>
+              <p>Robos frecuentes en el área</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="risk-item medium">
-      <div class="risk-indicator"></div>
-      <span>Riesgo Medio</span>
-      <div class="simple-tooltip">
-        <strong>Riesgo Medio detectado</strong>
-        <p>Robos ocasionales reportados</p>
-      </div>
-    </div>
-    <div class="risk-item high">
-      <div class="risk-indicator"></div>
-      <span>Riesgo Alto</span>
-      <div class="simple-tooltip">
-        <strong>Riesgo Alto detectado</strong>
-        <p>Robos frecuentes en el área</p>
-      </div>
-    </div>
-  </div>
-</div>
 
       <div class="panel-section">
         <h3 class="section-subtitle">Acciones Rápidas</h3>
         <div class="action-buttons">
-          <button class="action-btn report">
+          <button class="action-btn report" routerLink="/reportar-incidente">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
             </svg>
             Reportar Incidente
           </button>
-          <button class="action-btn stats">
+          <button class="action-btn stats" routerLink="/estadisticas">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/>
             </svg>
             Ver Estadísticas
           </button>
-          <button class="action-btn profile">
+          <button class="action-btn profile" routerLink="/perfil">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
               <path d="M12 14c-4.42 0-8 2.69-8 6v2h16v-2c0-3.31-3.58-6-8-6z"/>
