@@ -99,27 +99,20 @@
     }
   }
 
-  .login-button {
-    margin-top: 6px;
-    width: 100%;
-    padding: 0.95rem;
-    font-size: 1rem;
-    font-weight: 700;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    color: #fff;
+.login-button {
+ background-color: #df3257; // color de la "a" del logo
+  border: none;
+  border-radius: 8px; // opcional
+  color: white;
+  font-weight: bold;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 
-    /* degradado naranja/rojo */
-    background: linear-gradient(90deg, #ff6a20 0%, #ff4b2b 100%);
-    box-shadow: 0 8px 22px rgba(255,80,30,0.14);
-    transition: transform .12s ease, box-shadow .12s ease;
-
-    &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 36px rgba(18, 40, 86, 0.28);
-    }
+  &:hover {
+    background-color: darken(#df3257, 10%);
   }
+}
 
   .forgot-password {
     margin: 0.6rem auto 0;

@@ -129,7 +129,7 @@
             top: 1px;
             width: 5px;
             height: 9px;
-            border: solid #ff6a20;
+            border: solid #df3257;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
           }
@@ -137,7 +137,7 @@
 
         input[type="checkbox"]:checked + .checkmark {
           background: rgba(255,106,32,0.1);
-          border-color: #ff6a20;
+          border-color: #df3257;
 
           &::after {
             display: block;
@@ -145,7 +145,7 @@
         }
 
         .link {
-          color: #ff6a20;
+          color: #df3257;
           text-decoration: none;
 
           &:hover {
@@ -168,7 +168,7 @@
     color: #fff;
 
     /* degradado naranja/rojo - igual que login */
-    background: linear-gradient(90deg, #ff6a20 0%, #ff4b2b 100%);
+    background: linear-gradient(90deg, #df3257 0%, #df3257 100%);
     box-shadow: 0 8px 22px rgba(255,80,30,0.14);
     transition: transform .12s ease, box-shadow .12s ease;
 
@@ -185,7 +185,7 @@
     font-size: 0.92rem;
 
     .link {
-      color: #ff6a20;
+      color: #df3257;
       text-decoration: none;
       font-weight: 600;
 
