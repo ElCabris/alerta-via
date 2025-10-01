@@ -1,3 +1,4 @@
+@use "sass:color";
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -110,7 +111,7 @@
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: darken(#df3257, 10%);
+    background-color:color.adjust(#df3257, $lightness: -5%)
   }
 }
 

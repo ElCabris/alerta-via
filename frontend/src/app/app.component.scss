@@ -15,3 +15,7 @@ body {
 input, button {
   font-family: inherit;
 }
+
+.simple-tooltip {
+  z-index: 10000 !important;
+}
