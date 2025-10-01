@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent {
-  isEditing = false; // Agrega esta variable
+  isEditing = false;
   
   user = {
     name: 'Juan Pérez',
@@ -20,8 +20,7 @@ export class ProfileComponent {
   };
 
   onSubmit() {
-    // Tu lógica para guardar los cambios
-    console.log('Perfil actualizado:', this.user);
-    this.isEditing = false; // Vuelve al modo visualización después de guardar
+        console.log('Perfil actualizado:', this.user);
+    this.isEditing = false; 
   }
 }
