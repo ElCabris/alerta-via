@@ -1,0 +1,38 @@
+<div class="statistics-container">
+  <header class="statistics-header">
+    <div class="header-content">
+      <img src="/Logo.webp" alt="AlertaVia Logo" class="header-logo">
+      <h1>Estadísticas</h1>
+    </div>
+    <button class="back-btn" routerLink="/dashboard">Volver al Dashboard</button>
+  </header>
+
+  <div class="statistics-content">
+    <div class="stats-grid">
+      <div class="stat-card" *ngFor="let stat of stats">
+        <div class="stat-value">{{stat.value}}</div>
+        <div class="stat-label">{{stat.label}}</div>
+        <div class="stat-trend" [class.positive]="stat.trend.startsWith('+')" 
+                              [class.negative]="stat.trend.startsWith('-')">
+          {{stat.trend}}
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-section">
+      <div class="chart-card">
+        <h3>Incidentes por Tipo</h3>
+        <div class="chart-placeholder">
+          <p>Gráfico de incidentes por tipo se mostrará aquí</p>
+        </div>
+      </div>
+      
+      <div class="chart-card">
+        <h3>Zonas de Riesgo</h3>
+        <div class="chart-placeholder">
+          <p>Mapa de calor de zonas de riesgo se mostrará aquí</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
