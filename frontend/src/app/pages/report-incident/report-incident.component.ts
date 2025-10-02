@@ -16,6 +16,6 @@ export class ReportIncidentComponent {
   
   onSubmit() {
     console.log('Incidente reportado:', this.selectedType);
-    // Lógica para enviar el reporte
+    // Lógica para enviar el reporte back
   }
 }
