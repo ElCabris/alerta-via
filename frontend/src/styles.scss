@@ -108,6 +108,57 @@ body {
   }
 }
 
+/* ===== NUEVAS ANIMACIONES PARA DASHBOARD ===== */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(223, 50, 87, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(223, 50, 87, 0.8), 0 0 30px rgba(223, 50, 87, 0.6);
+  }
+}
+
+@keyframes staggeredFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mapGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blinkCaret {
+  from, to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: #df3257;
+  }
+}
+
 /* ===== CLASES DE ANIMACIÓNES ===== */
 .animate-fadeIn {
   animation: fadeIn 0.8s ease-out both;
@@ -145,3 +196,23 @@ body {
   animation: bounceIn 0.6s ease-out both;
 }
 
+.animate-glowPulse {
+  animation: glowPulse 2s infinite;
+}
+
+.animate-staggeredFadeIn {
+  animation: staggeredFadeIn 0.5s ease-out both;
+}
+
+.animate-mapGlow {
+  animation: mapGlow 8s ease-in-out infinite;
+}
+
+.animate-typewriter {
+  overflow: hidden;
+  border-right: 2px solid #df3257;
+  white-space: nowrap;
+  animation: 
+    typewriter 3s steps(40, end),
+    blinkCaret 0.75s step-end infinite;
+}

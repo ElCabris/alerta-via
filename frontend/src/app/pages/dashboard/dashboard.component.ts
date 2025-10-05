@@ -11,10 +11,10 @@ import { RouterModule } from '@angular/router';
 })
 export class DashboardComponent implements OnInit {
   currentTime: string = '';
+  isQuickActionsOpen: boolean = false;
 
   ngOnInit() {
     this.updateTime();
-
     setInterval(() => this.updateTime(), 60000);
   }
 
@@ -25,5 +25,9 @@ export class DashboardComponent implements OnInit {
       minute: '2-digit',
       second: '2-digit'
     });
+  }
+
+  toggleQuickActions() {
+    this.isQuickActionsOpen = !this.isQuickActionsOpen;
   }
 }
