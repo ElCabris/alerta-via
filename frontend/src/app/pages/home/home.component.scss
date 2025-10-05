@@ -14,6 +14,7 @@
 
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #fff;
+  
   animation: fadeIn 0.8s ease-out;
 }
 
@@ -82,6 +83,23 @@
       position: relative;
       display: flex;
       align-items: center;
+      transition: all 0.3s ease;
+
+      &.error {
+        input {
+          border: 1px solid #ff6b6b;
+          background: rgba(255, 107, 107, 0.05);
+          
+          &:focus {
+            box-shadow: 0 0 0 4px rgba(255, 107, 107, 0.1);
+            border-color: #ff6b6b;
+          }
+        }
+        
+        .icon {
+          color: #ff6b6b;
+        }
+      }
 
       .icon {
         position: absolute;
@@ -97,7 +115,7 @@
         width: 100%;
         padding: 0.85rem 1rem 0.85rem 44px; 
         border-radius: 8px;
-        border: none;
+        border: 1px solid transparent;
         outline: none;
         font-size: 1rem;
         color: #fff;
@@ -112,39 +130,88 @@
         &:focus {
           box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 0 4px rgba(255,140,60,0.06);
           transform: translateY(-2px);
+          border-color: rgba(255,255,255,0.2);
           
           & + .icon {
             color: rgba(255,255,255,0.8);
           }
         }
         
-        &:hover {
+        &:hover:not(:disabled) {
           background: rgba(255,255,255,0.08);
         }
       }
     }
+
+    .error-message {
+      color: #ff6b6b;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      animation: fadeIn 0.3s ease-out;
+    }
+  }
+
+  // Contenedor para centrar el botón más estrecho
+  .button-container {
+    display: flex;
+    justify-content: center;
+    margin: 0.5rem 0;
   }
 
   .login-button {
     background-color: #df3257;
     border: none;
-    border-radius: 8px;
+    border-radius: 13px;
     color: white;
-    font-weight: bold;
-    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 10px 30px;
     cursor: pointer;
     transition: all 0.3s ease;
     opacity: 0;
     animation: scaleIn 0.4s 1s ease-out both;
-
-    &:hover {
-      background-color: color.adjust(#df3257, $lightness: -5%);
-      transform: scale(1.05);
-      box-shadow: 0 10px 30px rgba(223, 50, 87, 0.4);
+    position: relative;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    // Ancho más estrecho pero manteniendo impacto
+    width: 350px;
+    
+    // Efectos de hover y estados
+    &:hover:not(:disabled) {
+      background-color: color.adjust(#df3257, $lightness: -8%);
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(223, 50, 87, 0.5);
     }
     
-    &:active {
-      transform: scale(0.98);
+    &:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
+
+    // Estado deshabilitado (loading)
+    &:disabled {
+      background-color: color.adjust(#df3257, $lightness: 15%);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .loading-text {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
     }
   }
 
@@ -158,6 +225,7 @@
     animation: fadeInUp 0.3s ease-out both;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
     
     &:nth-child(1) { 
       animation-delay: 1.1s; 
@@ -177,7 +245,7 @@
       transition: left 0.3s ease;
     }
 
-    &:hover { 
+    &:hover:not(.disabled) { 
       text-decoration: none; 
       color: #fff; 
       
@@ -185,6 +253,31 @@
         left: 0;
       }
     }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Animación del spinner
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Deshabilitar inputs durante carga
+.input-wrapper input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.03);
+  
+  &:focus {
+    transform: none;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.35);
   }
 }
 
@@ -195,15 +288,39 @@
     width: 92vw;
     border-radius: 12px;
   }
+  
   .logo-header .logo-img { 
     width: 180px; 
   }
+  
   .login-form .form-group .input-wrapper .icon { 
     left: 10px; 
     width: 18px; 
     height: 18px; 
   }
+  
   .login-form .form-group .input-wrapper input { 
     padding-left: 42px; 
+  }
+
+  // En móvil el botón ocupa el ancho completo
+  .login-button {
+    width: 100% !important;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 380px) {
+  .card {
+    padding: 1.2rem;
+  }
+  
+  .login-form {
+    gap: 1rem;
+  }
+  
+  .login-button {
+    padding: 12px 30px;
+    min-height: 44px;
   }
 }
