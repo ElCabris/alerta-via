@@ -21,7 +21,7 @@ export class HomeComponent {
     console.log('Password:', this.password);
     
     if (this.email && this.password) {
-      // validacion con el backend
+      // validacion con el backe
       alert('Iniciando sesión...');
       
       this.router.navigate(['/dashboard']);
