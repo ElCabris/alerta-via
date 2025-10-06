@@ -1,7 +1,10 @@
 <div class="incident-container">
   <header class="incident-header">
     <div class="header-content">
-      <img src="/Logo.webp" alt="AlertaVia Logo" class="header-logo">
+      <!-- Logo con enlace al dashboard -->
+      <a routerLink="/dashboard" class="logo-link">
+        <img src="/Logo.webp" alt="AlertaVia Logo" class="header-logo">
+      </a>
       <h1>Reportar Incidente</h1>
     </div>
     <button class="back-btn" routerLink="/dashboard">Volver al Dashboard</button>
@@ -12,10 +15,10 @@
       <form class="incident-form" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label for="incidentType">Tipo de Incidente</label>
-        <select id="incidentType" [(ngModel)]="selectedType" name="incidentType" required>
-        <option value="" disabled selected>Selecciona un tipo</option>
-        <option *ngFor="let type of incidentTypes" [value]="type">{{type}}</option>
-        </select>
+          <select id="incidentType" [(ngModel)]="selectedType" name="incidentType" required>
+            <option value="" disabled selected>Selecciona un tipo</option>
+            <option *ngFor="let type of incidentTypes" [value]="type">{{type}}</option>
+          </select>
         </div>
 
         <div class="form-group">
