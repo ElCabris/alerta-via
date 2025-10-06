@@ -20,7 +20,7 @@ export class ProfileComponent {
   };
 
   onSubmit() {
-        console.log('Perfil actualizado:', this.user);
+    console.log('Perfil actualizado:', this.user);
     this.isEditing = false; 
   }
 }
