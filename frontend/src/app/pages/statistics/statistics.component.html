@@ -1,7 +1,10 @@
 <div class="statistics-container">
   <header class="statistics-header">
     <div class="header-content">
-      <img src="/Logo.webp" alt="AlertaVia Logo" class="header-logo">
+      <!-- Logo con enlace al dashboard -->
+      <a routerLink="/dashboard" class="logo-link">
+        <img src="/Logo.webp" alt="AlertaVia Logo" class="header-logo">
+      </a>
       <h1>Estadísticas</h1>
     </div>
     <button class="back-btn" routerLink="/dashboard">Volver al Dashboard</button>
@@ -9,7 +12,7 @@
 
   <div class="statistics-content">
     <div class="stats-grid">
-      <div class="stat-card" *ngFor="let stat of stats">
+      <div class="stat-card" *ngFor="let stat of stats; let i = index">
         <div class="stat-value">{{stat.value}}</div>
         <div class="stat-label">{{stat.label}}</div>
         <div class="stat-trend" [class.positive]="stat.trend.startsWith('+')" 

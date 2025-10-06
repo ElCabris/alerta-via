@@ -175,11 +175,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    // Ancho más estrecho pero manteniendo impacto
     width: 350px;
     
-    // Efectos de hover y estados
     &:hover:not(:disabled) {
       background-color: color.adjust(#df3257, $lightness: -8%);
       transform: translateY(-2px) scale(1.02);
@@ -190,7 +187,6 @@
       transform: translateY(0) scale(0.98);
     }
 
-    // Estado deshabilitado (loading)
     &:disabled {
       background-color: color.adjust(#df3257, $lightness: 15%);
       cursor: not-allowed;
@@ -262,14 +258,12 @@
   }
 }
 
-// Animación del spinner
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-// Deshabilitar inputs durante carga
 .input-wrapper input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -281,7 +275,6 @@
   }
 }
 
-/* Responsive */
 @media (max-width: 480px) {
   .card {
     padding: 1.6rem;
@@ -303,7 +296,6 @@
     padding-left: 42px; 
   }
 
-  // En móvil el botón ocupa el ancho completo
   .login-button {
     width: 100% !important;
     max-width: 280px;
