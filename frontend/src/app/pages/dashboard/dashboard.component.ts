@@ -16,6 +16,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   currentTime: string = '';
   isQuickActionsOpen: boolean = false;
   showLogoutModal: boolean = false;
+  
+  // Propiedades agregadas
+  isMobilePanelOpen: boolean = false;
+  isAdditionalInfoOpen: boolean = false;
 
   // Variables para el mapa
   private map: any;
@@ -41,6 +45,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.map) {
       this.map.remove();
     }
+  }
+
+  // Métodos agregados para la funcionalidad del panel móvil
+  toggleMobilePanel() {
+    this.isMobilePanelOpen = !this.isMobilePanelOpen;
+  }
+
+  toggleAdditionalInfo() {
+    this.isAdditionalInfoOpen = !this.isAdditionalInfoOpen;
   }
 
   initializeMap() {
