@@ -1,0 +1,57 @@
+{
+  "total_records": 284007,
+  "grid_resolution": 0.0045,
+  "grid_size": 2400,
+  "periods": [
+    {
+      "period": "weekday_morning",
+      "count": 57503,
+      "max_density": 0.030602217213196906,
+      "mean_density": 0.0004166666666666659
+    },
+    {
+      "period": "weekday_afternoon",
+      "count": 62351,
+      "max_density": 0.042905248498986956,
+      "mean_density": 0.00041666666666666577
+    },
+    {
+      "period": "weekday_evening",
+      "count": 59714,
+      "max_density": 0.027111453462000067,
+      "mean_density": 0.0004166666666666659
+    },
+    {
+      "period": "weekday_night",
+      "count": 32243,
+      "max_density": 0.02574216541031483,
+      "mean_density": 0.0004166666666666658
+    },
+    {
+      "period": "weekend_morning",
+      "count": 15211,
+      "max_density": 0.021090306682530324,
+      "mean_density": 0.0004166666666666658
+    },
+    {
+      "period": "weekend_afternoon",
+      "count": 19769,
+      "max_density": 0.03797731533122009,
+      "mean_density": 0.0004166666666666658
+    },
+    {
+      "period": "weekend_evening",
+      "count": 18204,
+      "max_density": 0.02474330700140055,
+      "mean_density": 0.0004166666666666657
+    },
+    {
+      "period": "weekend_night",
+      "count": 19012,
+      "max_density": 0.022929845113650538,
+      "mean_density": 0.00041666666666666577
+    }
+  ],
+  "global_max_density": 0.03994054063901791,
+  "global_mean_density": 0.0004166666666666658
+}

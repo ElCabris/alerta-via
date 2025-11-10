@@ -1,37 +1,364 @@
-<div class="statistics-container">
+<div class="statistics-container" (keydown)="onKeydown($event)">
   <header class="statistics-header">
     <div class="header-content">
-      <img src="/Logo.webp" alt="AlertaVia Logo" class="header-logo">
+      <a routerLink="/dashboard" class="logo-link">
+        <img src="/Logo.webp" alt="AlertaVia Logo" class="header-logo">
+      </a>
       <h1>Estadísticas</h1>
     </div>
-    <button class="back-btn" routerLink="/dashboard">Volver al Dashboard</button>
+    <div class="header-actions">
+      <button class="back-btn" routerLink="/dashboard">Volver al Dashboard</button>
+      <button class="logout-btn" (click)="openLogoutConfirmation()" aria-label="Cerrar sesión">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+        </svg>
+        Cerrar Sesión
+      </button>
+    </div>
   </header>
 
   <div class="statistics-content">
+    <div *ngIf="loading" class="loading-overlay">
+      <div class="loading-spinner"></div>
+      <p>Cargando estadísticas...</p>
+    </div>
+
     <div class="stats-grid">
-      <div class="stat-card" *ngFor="let stat of stats">
+      <div class="stat-card" *ngFor="let stat of stats; let i = index">
         <div class="stat-value">{{stat.value}}</div>
         <div class="stat-label">{{stat.label}}</div>
         <div class="stat-trend" [class.positive]="stat.trend.startsWith('+')" 
-                              [class.negative]="stat.trend.startsWith('-')">
+                              [class.negative]="stat.trend.startsWith('-') && !stat.trend.startsWith('+')">
           {{stat.trend}}
         </div>
       </div>
     </div>
 
     <div class="charts-section">
-      <div class="chart-card">
+      <!-- Gráfico de Barras por Tipo -->
+      <div class="chart-card incidents-chart-card">
         <h3>Incidentes por Tipo</h3>
-        <div class="chart-placeholder">
-          <p>Gráfico de incidentes por tipo se mostrará aquí</p>
+        <div class="chart-container">
+          <div class="chart-wrapper">
+            <svg class="incidents-chart" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+              <!-- Gráfico de barras -->
+              <g class="bars-group">
+                <rect 
+                  *ngFor="let item of incidentsByType; let i = index"
+                  [attr.x]="getBarX(i)"
+                  [attr.y]="getBarY(item.count)"
+                  [attr.width]="barWidth"
+                  [attr.height]="getBarHeight(item.count)"
+                  [attr.fill]="getTypeColor(item.type)"
+                  class="bar"
+                  [attr.data-type]="item.type"
+                  [attr.data-count]="item.count">
+                  <title>{{item.type}}: {{item.count}} incidentes</title>
+                </rect>
+              </g>
+              <!-- Ejes -->
+              <g class="axes-group">
+                <line x1="40" y1="260" x2="360" y2="260" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <line x1="40" y1="260" x2="40" y2="20" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <!-- Etiquetas del eje Y -->
+                <text *ngFor="let tick of yAxisTicks" 
+                      [attr.x]="35" 
+                      [attr.y]="tick.y" 
+                      fill="rgba(255,255,255,0.6)" 
+                      font-size="10" 
+                      text-anchor="end"
+                      alignment-baseline="middle">{{tick.value}}</text>
+              </g>
+              <!-- Etiquetas del eje X -->
+              <g class="labels-group">
+                <text 
+                  *ngFor="let item of incidentsByType; let i = index"
+                  [attr.x]="getBarX(i) + barWidth / 2"
+                  [attr.y]="275"
+                  fill="rgba(255,255,255,0.7)"
+                  font-size="11"
+                  text-anchor="middle"
+                  class="type-label">{{getShortLabel(item.type)}}</text>
+              </g>
+              <!-- Valores en las barras -->
+              <g class="values-group">
+                <text 
+                  *ngFor="let item of incidentsByType; let i = index"
+                  [attr.x]="getBarX(i) + barWidth / 2"
+                  [attr.y]="getBarY(item.count) - 5"
+                  fill="white"
+                  font-size="12"
+                  font-weight="600"
+                  text-anchor="middle"
+                  class="value-label">{{item.count}}</text>
+              </g>
+            </svg>
+          </div>
+          <!-- Leyenda -->
+          <div class="chart-legend">
+            <div class="legend-item" *ngFor="let item of incidentsByType">
+              <span class="legend-color" [style.background-color]="getTypeColor(item.type)"></span>
+              <span class="legend-text">{{item.type}} ({{item.count}})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico Circular por Tipo -->
+      <div class="chart-card pie-chart-card">
+        <h3>Distribución por Tipo</h3>
+        <div class="chart-container">
+          <div class="chart-wrapper">
+            <svg class="pie-chart" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+              <g class="pie-slices">
+                <path 
+                  *ngFor="let item of incidentsByType; let i = index"
+                  [attr.d]="getPiePath(i)"
+                  [attr.fill]="getTypeColor(item.type)"
+                  class="pie-slice"
+                  [attr.data-type]="item.type"
+                  [attr.data-count]="item.count">
+                  <title>{{item.type}}: {{item.count}} incidentes</title>
+                </path>
+              </g>
+            </svg>
+          </div>
+          <div class="chart-legend">
+            <div class="legend-item" *ngFor="let item of incidentsByType">
+              <span class="legend-color" [style.background-color]="getTypeColor(item.type)"></span>
+              <span class="legend-text">{{item.type}} ({{item.count}})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico de Línea Temporal -->
+      <div class="chart-card timeline-chart-card">
+        <h3>Evolución Temporal (Últimos 30 días)</h3>
+        <div class="chart-container">
+          <div class="chart-wrapper">
+            <svg class="timeline-chart" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+              <!-- Línea -->
+              <polyline
+                *ngIf="timeline.length > 0"
+                [attr.points]="getTimelinePoints()"
+                fill="none"
+                stroke="#df3257"
+                stroke-width="3"
+                class="timeline-line"
+              />
+              <!-- Puntos -->
+              <circle
+                *ngFor="let item of timeline; let i = index"
+                [attr.cx]="getTimelineX(i)"
+                [attr.cy]="getTimelineY(item.count)"
+                r="4"
+                fill="#df3257"
+                class="timeline-point"
+                [attr.data-date]="item.date"
+                [attr.data-count]="item.count">
+                <title>{{item.date}}: {{item.count}} incidentes</title>
+              </circle>
+              <!-- Ejes -->
+              <g class="axes-group">
+                <line x1="40" y1="260" x2="360" y2="260" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <line x1="40" y1="260" x2="40" y2="20" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <!-- Etiquetas del eje Y -->
+                <text *ngFor="let tick of yAxisTicksTimeline" 
+                      [attr.x]="35" 
+                      [attr.y]="tick.y" 
+                      fill="rgba(255,255,255,0.6)" 
+                      font-size="10" 
+                      text-anchor="end"
+                      alignment-baseline="middle">{{tick.value}}</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico por Hora del Día -->
+      <div class="chart-card hour-chart-card">
+        <h3>Incidentes por Hora del Día</h3>
+        <div class="chart-container">
+          <div class="chart-wrapper">
+            <svg class="hour-chart" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+              <!-- Barras -->
+              <g class="bars-group">
+                <rect 
+                  *ngFor="let item of incidentsByHour; let i = index"
+                  [attr.x]="getHourBarX(i)"
+                  [attr.y]="getHourBarY(item.count)"
+                  width="12"
+                  [attr.height]="getHourBarHeight(item.count)"
+                  fill="#ff6b35"
+                  class="bar"
+                  [attr.data-hour]="item.hour"
+                  [attr.data-count]="item.count">
+                  <title>{{item.label}}: {{item.count}} incidentes</title>
+                </rect>
+              </g>
+              <!-- Ejes -->
+              <g class="axes-group">
+                <line x1="40" y1="260" x2="360" y2="260" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <line x1="40" y1="260" x2="40" y2="20" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <!-- Etiquetas del eje Y -->
+                <text *ngFor="let tick of yAxisTicksHour" 
+                      [attr.x]="35" 
+                      [attr.y]="tick.y" 
+                      fill="rgba(255,255,255,0.6)" 
+                      font-size="10" 
+                      text-anchor="end"
+                      alignment-baseline="middle">{{tick.value}}</text>
+                <!-- Etiquetas del eje X (cada 2 horas) -->
+                <text 
+                  *ngFor="let item of incidentsByHour; let i = index"
+                  [attr.x]="getHourBarX(i) + 6"
+                  [attr.y]="275"
+                  fill="rgba(255,255,255,0.7)"
+                  font-size="9"
+                  text-anchor="middle"
+                  class="hour-label"
+                  [style.display]="item.hour % 2 === 0 ? 'block' : 'none'">{{item.hour}}</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico por Día de la Semana -->
+      <div class="chart-card day-chart-card">
+        <h3>Incidentes por Día de la Semana</h3>
+        <div class="chart-container">
+          <div class="chart-wrapper">
+            <svg class="day-chart" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+              <!-- Barras -->
+              <g class="bars-group">
+                <rect 
+                  *ngFor="let item of incidentsByDay; let i = index"
+                  [attr.x]="getBarX(i)"
+                  [attr.y]="getBarY(item.count)"
+                  [attr.width]="barWidth"
+                  [attr.height]="getBarHeight(item.count)"
+                  fill="#ffc107"
+                  class="bar"
+                  [attr.data-day]="item.day"
+                  [attr.data-count]="item.count">
+                  <title>{{item.day}}: {{item.count}} incidentes</title>
+                </rect>
+              </g>
+              <!-- Ticks del eje Y para días -->
+              <g class="y-axis-ticks">
+                <text *ngFor="let tick of yAxisTicks" 
+                      [attr.x]="35" 
+                      [attr.y]="tick.y" 
+                      fill="rgba(255,255,255,0.6)" 
+                      font-size="10" 
+                      text-anchor="end"
+                      alignment-baseline="middle">{{tick.value}}</text>
+              </g>
+              <!-- Ejes -->
+              <g class="axes-group">
+                <line x1="40" y1="260" x2="360" y2="260" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <line x1="40" y1="260" x2="40" y2="20" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <!-- Etiquetas del eje X -->
+                <text 
+                  *ngFor="let item of incidentsByDay; let i = index"
+                  [attr.x]="getBarX(i) + barWidth / 2"
+                  [attr.y]="275"
+                  fill="rgba(255,255,255,0.7)"
+                  font-size="11"
+                  text-anchor="middle"
+                  class="day-label">{{getDayShortLabel(item.day)}}</text>
+              </g>
+              <!-- Valores en las barras -->
+              <g class="values-group">
+                <text 
+                  *ngFor="let item of incidentsByDay; let i = index"
+                  [attr.x]="getBarX(i) + barWidth / 2"
+                  [attr.y]="getBarY(item.count) - 5"
+                  fill="white"
+                  font-size="12"
+                  font-weight="600"
+                  text-anchor="middle"
+                  class="value-label">{{item.count}}</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico por Barrios -->
+      <div class="chart-card barrio-chart-card">
+        <h3>Top 10 Barrios con Más Incidentes</h3>
+        <div class="chart-container">
+          <div class="barrio-list">
+            <div class="barrio-item" *ngFor="let item of incidentsByBarrio; let i = index">
+              <div class="barrio-rank">{{i + 1}}</div>
+              <div class="barrio-info">
+                <div class="barrio-name">{{item.barrio}}</div>
+                <div class="barrio-bar-container">
+                  <div class="barrio-bar" [style.width.%]="incidentsByBarrio.length > 0 ? (item.count / incidentsByBarrio[0].count) * 100 : 0" 
+                       [style.background-color]="getTypeColor('Hurto a Persona')">
+                    <span class="barrio-count">{{item.count}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
-      <div class="chart-card">
-        <h3>Zonas de Riesgo</h3>
-        <div class="chart-placeholder">
-          <p>Mapa de calor de zonas de riesgo se mostrará aquí</p>
+      <div class="chart-card heatmap-card">
+        <h3>Zonas de Riesgo - Mapa de Calor</h3>
+        <div class="heatmap-container">
+          <div id="heatmap" class="heatmap"></div>
+          <div class="heatmap-legend">
+            <div class="legend-item">
+              <span class="legend-color low-risk"></span>
+              <span>Riesgo Bajo</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color medium-risk"></span>
+              <span>Riesgo Medio</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color high-risk"></span>
+              <span>Riesgo Alto</span>
+            </div>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" [class.active]="showLogoutModal" (click)="closeLogoutModal()">
+    <div class="confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Cerrar Sesión</h3>
+        <button class="modal-close" (click)="closeLogoutModal()" aria-label="Cerrar diálogo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="modal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+          </svg>
+        </div>
+        <p class="modal-message">¿Estás seguro de que deseas cerrar sesión?</p>
+        <p class="modal-submessage">Serás redirigido a la página de inicio de sesión.</p>
+      </div>
+      
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeLogoutModal()">
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="confirmLogout()">
+          Sí, Cerrar Sesión
+        </button>
       </div>
     </div>
   </div>

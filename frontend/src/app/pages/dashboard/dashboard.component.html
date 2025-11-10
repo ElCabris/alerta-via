@@ -1,75 +1,197 @@
-<div class="dashboard-container">
-  <header class="dashboard-header">
+<div class="dashboard-container" (keydown)="onKeydown($event)">
+  <header class="dashboard-header" role="banner">
     <div class="header-left">
-      <img src="/Logo.webp" alt="AlertVia Logo" class="header-logo">
+      <img src="/Logo.webp" alt="AlertVia Logo" class="header-logo" loading="eager">
     </div>
     <div class="header-right">
-      <button class="profile-btn" routerLink="/perfil">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+      <button class="profile-btn" routerLink="/perfil" aria-label="Ir a mi perfil">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
           <path d="M12 14c-4.42 0-8 2.69-8 6v2h16v-2c0-3.31-3.58-6-8-6z"/>
         </svg>
         Mi Perfil
       </button>
+      <!-- Botón de Cerrar Sesión Agregado -->
+      <button class="logout-btn" (click)="openLogoutConfirmation()" aria-label="Cerrar sesión">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+        </svg>
+        Cerrar Sesión
+      </button>
     </div>
   </header>
 
   <div class="dashboard-content">
-    <aside class="control-panel">
+    <aside class="control-panel" role="complementary" aria-label="Panel de control de rutas">
       <div class="panel-section">
         <h2 class="section-title">Planifica tu Ruta Segura</h2>
-        
+
+        <div class="info-text">
+          <p><strong>Instrucciones:</strong> Ingresa direcciones o haz clic en el mapa para establecer origen y destino. Puedes arrastrar los marcadores para ajustarlos.</p>
+        </div>
+
+        <!-- Campos de direcciones -->
         <div class="input-group">
-          <label for="origin">¿Dónde estoy?</label>
-          <div class="input-with-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
-            </svg>
-            <input type="text" id="origin" placeholder="Ingresa tu ubicación actual">
+          <label for="originInput">📍 Origen</label>
+          <div class="input-with-button">
+            <input 
+              type="text" 
+              id="originInput" 
+              [(ngModel)]="originInput" 
+              placeholder="Ej: Calle 50 #45-20, Medellín"
+              class="form-input"
+              (keyup.enter)="geocodeOrigin()">
+            <button 
+              class="search-btn" 
+              (click)="geocodeOrigin()"
+              [disabled]="isGeocodingOrigin || !originInput.trim()"
+              title="Buscar dirección">
+              <span *ngIf="!isGeocodingOrigin">🔍</span>
+              <span *ngIf="isGeocodingOrigin">⏳</span>
+            </button>
           </div>
+          <small class="form-help" *ngIf="originAddress">{{ originAddress }}</small>
         </div>
 
         <div class="input-group">
-          <label for="destination">¿A dónde voy?</label>
-          <div class="input-with-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/>
-            </svg>
-            <input type="text" id="destination" placeholder="Ingresa tu destino">
+          <label for="destinationInput">📍 Destino</label>
+          <div class="input-with-button">
+            <input 
+              type="text" 
+              id="destinationInput" 
+              [(ngModel)]="destinationInput" 
+              placeholder="Ej: Parque Lleras, Medellín"
+              class="form-input"
+              (keyup.enter)="geocodeDestination()">
+            <button 
+              class="search-btn" 
+              (click)="geocodeDestination()"
+              [disabled]="isGeocodingDestination || !destinationInput.trim()"
+              title="Buscar dirección">
+              <span *ngIf="!isGeocodingDestination">🔍</span>
+              <span *ngIf="isGeocodingDestination">⏳</span>
+            </button>
+          </div>
+          <small class="form-help" *ngIf="destinationAddress">{{ destinationAddress }}</small>
+        </div>
+
+        <!-- Selector de modo (alternativa: clic en mapa) -->
+        <div class="selection-mode-container">
+          <label class="mode-label">O haz clic en el mapa:</label>
+          <div class="mode-buttons">
+            <button 
+              class="mode-btn" 
+              [class.active]="selectionMode === 'origin'"
+              (click)="setSelectionMode('origin')"
+              title="Haz clic en el mapa para establecer origen">
+              Origen
+            </button>
+            <button 
+              class="mode-btn" 
+              [class.active]="selectionMode === 'destination'"
+              (click)="setSelectionMode('destination')"
+              title="Haz clic en el mapa para establecer destino">
+              Destino
+            </button>
+            <button 
+              class="mode-btn" 
+              [class.active]="selectionMode === 'auto'"
+              (click)="setSelectionMode('auto')"
+              title="Selección automática (origen primero, luego destino)">
+              Auto
+            </button>
           </div>
         </div>
 
-        <button class="route-btn primary">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <!-- Puntos establecidos -->
+        <div class="points-status" *ngIf="originCoords || destinationCoords">
+          <div class="point-status" *ngIf="originCoords">
+            <span class="point-label">📍 Origen:</span>
+            <span class="point-coords" *ngIf="originAddress">{{ originAddress }}</span>
+            <span class="point-coords" *ngIf="!originAddress">{{ originCoords.lat.toFixed(6) }}, {{ originCoords.lng.toFixed(6) }}</span>
+            <button class="clear-point-btn" (click)="clearOrigin()" title="Limpiar origen">×</button>
+          </div>
+          <div class="point-status" *ngIf="destinationCoords">
+            <span class="point-label">📍 Destino:</span>
+            <span class="point-coords" *ngIf="destinationAddress">{{ destinationAddress }}</span>
+            <span class="point-coords" *ngIf="!destinationAddress">{{ destinationCoords.lat.toFixed(6) }}, {{ destinationCoords.lng.toFixed(6) }}</span>
+            <button class="clear-point-btn" (click)="clearDestination()" title="Limpiar destino">×</button>
+          </div>
+        </div>
+
+        <button 
+          class="route-btn primary" 
+          (click)="traceRoute()" 
+          [disabled]="isLoadingPrediction || !originCoords || !destinationCoords"
+          aria-describedby="route-help">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" *ngIf="!isLoadingPrediction">
             <path d="M21.71 11.29l-9-9a1 1 0 0 0-1.42 0l-9 9a1 1 0 0 0 0 1.42l9 9a1 1 0 0 0 1.42 0l9-9a1 1 0 0 0 0-1.42zM14 14.5V12h-4v2.5l-2.5-2.5L10 8.5 12 11V8h4v3l2-2.5 2.5 2.5z"/>
           </svg>
-          Trazar Ruta Segura
+          <span *ngIf="isLoadingPrediction">Cargando...</span>
+          <span *ngIf="!isLoadingPrediction">Trazar Ruta Segura</span>
         </button>
+        
+        <button 
+          class="route-btn secondary" 
+          (click)="clearRouteAndPoints()"
+          *ngIf="originCoords || destinationCoords">
+          Limpiar Ruta
+        </button>
+
+        <div id="route-help" class="sr-only">Calcula la ruta más segura basada en predicciones de ML</div>
+
+        <!-- Mostrar error si hay -->
+        <div class="error-message" *ngIf="predictionError">
+          {{ predictionError }}
+        </div>
+
+        <!-- Mostrar resultados de predicción -->
+        <div class="prediction-results" *ngIf="predictionResult">
+          <h3 class="results-title">Resultados de la Predicción</h3>
+          <div class="result-stats">
+            <div class="stat-item">
+              <span class="stat-label">Probabilidad Promedio:</span>
+              <span class="stat-value">{{ (predictionResult.probabilidad_promedio * 100).toFixed(1) }}%</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Puntos Alto Riesgo:</span>
+              <span class="stat-value high">{{ predictionResult.riesgo_alto_count }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Puntos Medio Riesgo:</span>
+              <span class="stat-value medium">{{ predictionResult.riesgo_medio_count }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Puntos Bajo Riesgo:</span>
+              <span class="stat-value low">{{ predictionResult.riesgo_bajo_count }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="panel-section">
         <h3 class="section-subtitle">Niveles de Riesgo</h3>
-        <div class="risk-levels">
-          <div class="risk-item low">
-            <div class="risk-indicator"></div>
+        <div class="risk-levels" role="list" aria-label="Niveles de riesgo vial">
+          <div class="risk-item low" role="listitem" tabindex="0" aria-describedby="risk-low-desc">
+            <div class="risk-indicator" aria-hidden="true"></div>
             <span>Riesgo Bajo</span>
-            <div class="simple-tooltip">
+            <div class="simple-tooltip" id="risk-low-desc" role="tooltip">
               <strong>Riesgo Bajo detectado</strong>
               <p>Posible posibilidad de robo</p>
             </div>
           </div>
-          <div class="risk-item medium">
-            <div class="risk-indicator"></div>
+          <div class="risk-item medium" role="listitem" tabindex="0" aria-describedby="risk-medium-desc">
+            <div class="risk-indicator" aria-hidden="true"></div>
             <span>Riesgo Medio</span>
-            <div class="simple-tooltip">
+            <div class="simple-tooltip" id="risk-medium-desc" role="tooltip">
               <strong>Riesgo Medio detectado</strong>
               <p>Robos ocasionales reportados</p>
             </div>
           </div>
-          <div class="risk-item high">
-            <div class="risk-indicator"></div>
+          <div class="risk-item high" role="listitem" tabindex="0" aria-describedby="risk-high-desc">
+            <div class="risk-indicator" aria-hidden="true"></div>
             <span>Riesgo Alto</span>
-            <div class="simple-tooltip">
+            <div class="simple-tooltip" id="risk-high-desc" role="tooltip">
               <strong>Riesgo Alto detectado</strong>
               <p>Robos frecuentes en el área</p>
             </div>
@@ -79,61 +201,81 @@
 
       <div class="panel-section">
         <h3 class="section-subtitle">Acciones Rápidas</h3>
-        <div class="action-buttons">
-          <button class="action-btn report" routerLink="/reportar-incidente">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <div class="quick-actions-container">
+          <button class="quick-actions-main-btn" (click)="toggleQuickActions()" [attr.aria-expanded]="isQuickActionsOpen">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
             </svg>
-            Reportar Incidente
+            Acciones Rápidas
+            <span class="quick-actions-arrow" [class.rotated]="isQuickActionsOpen">▼</span>
           </button>
-          <button class="action-btn stats" routerLink="/estadisticas">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/>
-            </svg>
-            Ver Estadísticas
-          </button>
-          <button class="action-btn profile" routerLink="/perfil">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
-              <path d="M12 14c-4.42 0-8 2.69-8 6v2h16v-2c0-3.31-3.58-6-8-6z"/>
-            </svg>
-            Mi Perfil
-          </button>
+
+          <div class="quick-actions-dropdown" [class.open]="isQuickActionsOpen">
+            <button class="action-btn report" routerLink="/reportar-incidente" aria-label="Reportar incidente vial">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+              </svg>
+              Reportar Incidente
+            </button>
+            <button class="action-btn stats" routerLink="/estadisticas" aria-label="Ver estadísticas de alertas">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M16 11V3H8v6H2v12h20V11h-6zm-6-6h4v14h-4V5zm-6 6h4v8H4v-8zm16 8h-4v-6h4v6z"/>
+              </svg>
+              Ver Estadísticas
+            </button>
+          </div>
         </div>
       </div>
     </aside>
 
-    <main class="map-container">
-      <div class="map-placeholder" id="map">
-        <div class="map-overlay">
-          <div class="map-info">
-            <h3>Mapa en Tiempo Real</h3>
-            <p>Visualizando rutas seguras y alertas viales</p>
-            <div class="map-stats">
-              <div class="stat">
-                <span class="stat-number">12</span>
-                <span class="stat-label">Alertas Activas</span>
-              </div>
-              <div class="stat">
-                <span class="stat-number">45</span>
-                <span class="stat-label">Usuarios Cerca</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+<!-- En la sección del mapa, reemplaza el placeholder: -->
+<main class="map-container" role="main" aria-label="Mapa de alertas viales">
+  <div class="map" id="map" aria-live="polite" aria-atomic="true"></div>
+</main>
   </div>
 
-  <footer class="dashboard-footer">
+  <footer class="dashboard-footer" role="contentinfo">
     <div class="footer-stats">
-      <div class="live-alert">
-        <span class="alert-dot"></span>
+      <div class="live-alert" aria-live="polite">
+        <span class="alert-dot" aria-hidden="true"></span>
         <span>Sistema Activo - Monitoreando 15.2km a la redonda</span>
       </div>
-      <div class="update-time">
+      <div class="update-time" aria-live="polite">
         Última actualización: {{ currentTime }}
       </div>
     </div>
   </footer>
+
+  <!-- Modal de Confirmación de Cierre de Sesión -->
+  <div class="modal-overlay" [class.active]="showLogoutModal" (click)="closeLogoutModal()">
+    <div class="confirmation-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Cerrar Sesión</h3>
+        <button class="modal-close" (click)="closeLogoutModal()" aria-label="Cerrar diálogo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
+          </svg>
+        </div>
+        <p class="modal-message">¿Estás seguro de que deseas cerrar sesión?</p>
+        <p class="modal-submessage">Serás redirigido a la página de inicio de sesión.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" (click)="closeLogoutModal()">
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="confirmLogout()">
+          Sí, Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

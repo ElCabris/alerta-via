@@ -1,3 +1,104 @@
+/* ===== ANIMACIONES CSS ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(223, 50, 87, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(223, 50, 87, 0.8);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ===== ESTILOS CON ANIMACIONES ===== */
 .profile-container {
   min-height: 100vh;
   background: linear-gradient(rgba(7, 22, 52, 0.9), rgba(11, 74, 119, 0.9)), 
@@ -5,6 +106,7 @@
   background-size: cover;
   color: white;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  animation: fadeIn 0.8s ease-out;
 }
 
 .profile-header {
@@ -15,33 +117,88 @@
   background: rgba(6, 33, 57, 0.8);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  animation: slideInLeft 0.6s ease-out;
 
   .header-content {
     display: flex;
     align-items: center;
     gap: 1rem;
 
+    .logo-link {
+      display: block;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
     .header-logo {
       height: 60px;
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+      animation: bounceIn 0.8s ease-out;
     }
 
     h1 {
       margin: 0;
       font-size: 1.8rem;
+      animation: fadeInUp 0.6s 0.2s ease-out both;
     }
   }
 
-  .back-btn {
-    padding: 0.8rem 1.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: slideInRight 0.6s ease-out;
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.2);
+    .back-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(223, 50, 87, 0.3);
+      }
+    }
+
+    .logout-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(223, 50, 87, 0.2);
+      border: 1px solid rgba(223, 50, 87, 0.4);
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8 rem;
+
+      svg {
+        width: 20px;
+        height: 13px;
+        transition: transform 0.3s ease;
+      }
+
+      &:hover {
+        background: rgba(223, 50, 87, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(223, 50, 87, 0.4);
+        
+        svg {
+          transform: translateX(2px);
+        }
+      }
+
+      &:active {
+        transform: translateY(0);
+        background: rgba(223, 50, 87, 0.5);
+      }
     }
   }
 }
@@ -52,6 +209,7 @@
   align-items: center;
   padding: 2rem;
   min-height: calc(100vh - 120px);
+  animation: fadeIn 0.8s 0.3s ease-out both;
 }
 
 .profile-card {
@@ -63,11 +221,13 @@
   max-width: 500px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 18px 40px rgba(6, 23, 43, 0.6);
+  animation: scaleIn 0.6s 0.4s ease-out both;
 }
 
 .profile-avatar {
   text-align: center;
   margin-bottom: 2rem;
+  animation: fadeInUp 0.6s 0.5s ease-out both;
 
   .avatar-placeholder {
     width: 80px;
@@ -80,6 +240,12 @@
     font-size: 2rem;
     font-weight: bold;
     margin: 0 auto 1rem;
+    transition: all 0.3s ease;
+    animation: pulse 3s infinite 1s;
+
+    &:hover {
+      animation: glow 2s infinite, pulse 3s infinite;
+    }
   }
 
   h2 {
@@ -88,6 +254,22 @@
   }
 }
 
+/* Elementos animados escalonados */
+.animated-item {
+  opacity: 0;
+  animation: staggerFadeIn 0.6s ease-out forwards;
+  
+  // Animación escalonada automática
+  &:nth-child(1) { animation-delay: 0.6s; }
+  &:nth-child(2) { animation-delay: 0.7s; }
+  &:nth-child(3) { animation-delay: 0.8s; }
+  &:nth-child(4) { animation-delay: 0.9s; }
+}
+
+.animated-btn {
+  opacity: 0;
+  animation: scaleIn 0.5s 1s ease-out both;
+}
 
 .profile-view {
   .profile-info {
@@ -120,6 +302,13 @@
         min-height: 44px;
         display: flex;
         align-items: center;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.2);
+          transform: translateX(5px);
+        }
       }
     }
   }
@@ -138,7 +327,7 @@
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(255, 106, 32, 0.4);
+      box-shadow: 0 8px 25px rgba(223, 50, 87, 0.4);
     }
   }
 }
@@ -176,6 +365,9 @@
         outline: none;
         border-color: #df3257;
         background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(223, 50, 87, 0.3);
+        animation: glow 2s infinite;
       }
     }
   }
@@ -199,6 +391,8 @@
 
       &:hover {
         background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2);
       }
     }
 
@@ -215,9 +409,246 @@
       flex: 2;
 
       &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(255, 106, 32, 0.4);
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(223, 50, 87, 0.5);
+        animation: glow 2s infinite;
       }
     }
+  }
+}
+
+/* Transiciones suaves entre vistas */
+.profile-view, .profile-form {
+  transition: all 0.4s ease-in-out;
+}
+
+/* ===== MODAL DE CONFIRMACIÓN ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+
+  &.active {
+    opacity: 1;
+    visibility: visible;
+    animation: fadeIn 0.3s ease-out;
+  }
+}
+
+.confirmation-modal {
+  background: linear-gradient(135deg, #0b1e33 0%, #0d2b42 100%);
+  border: 1px solid rgba(223, 50, 87, 0.3);
+  border-radius: 16px;
+  padding: 0;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 30px rgba(223, 50, 87, 0.3);
+  transform: scale(0.9);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: modalSlideIn 0.3s 0.1s ease-out both;
+
+  .modal-overlay.active & {
+    transform: scale(1);
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .modal-title {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .modal-close {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    &:hover {
+      background: rgba(223, 50, 87, 0.3);
+      color: white;
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.modal-body {
+  padding: 2rem 1.5rem;
+  text-align: center;
+
+  .modal-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba(223, 50, 87, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    border: 2px solid rgba(223, 50, 87, 0.4);
+
+    svg {
+      width: 30px;
+      height: 30px;
+      color: #df3257;
+    }
+  }
+
+  .modal-message {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+    line-height: 1.4;
+  }
+
+  .modal-submessage {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.5rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  button {
+    flex: 1;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #df3257 0%, #c42c4d 100%);
+    color: white;
+    border: 1px solid rgba(223, 50, 87, 0.4);
+
+    &:hover {
+      background: linear-gradient(135deg, #e5395c 0%, #d42e50 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(223, 50, 87, 0.4);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Responsive para el modal */
+@media (max-width: 480px) {
+  .confirmation-modal {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+
+    .header-content {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .header-actions {
+      flex-direction: column;
+      width: 100%;
+      
+      .back-btn, .logout-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .profile-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  /* Ajustar animaciones para mobile */
+  .animated-item {
+    animation-duration: 0.4s;
   }
 }
