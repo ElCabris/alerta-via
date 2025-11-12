@@ -1214,6 +1214,52 @@
   }
 }
 
+.suggestions-list {
+  margin-top: 0.3rem;
+  background: rgba(6, 33, 57, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease-out;
+  z-index: 5;
+
+  .suggestion-item {
+    background: transparent;
+    border: none;
+    text-align: left;
+    padding: 0.55rem 0.75rem;
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+    transition: background 0.2s ease, padding-left 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    &:hover,
+    &:focus {
+      background: rgba(223, 50, 87, 0.15);
+      outline: none;
+      padding-left: 0.95rem;
+    }
+  }
+
+  .suggestion-main {
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+
+  .suggestion-sub {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: capitalize;
+  }
+}
+
 .form-help {
   display: block;
   margin-top: 0.3rem;

@@ -238,6 +238,7 @@ class RouteRequestOSRM(BaseModel):
 class GeocodeRequest(BaseModel):
     """Solicitud para geocodificar una dirección"""
     address: str  # Dirección a geocodificar
+    limit: Optional[int] = 5  # Número máximo de resultados similares a retornar
 
 
 @app.post("/route/osrm")
@@ -304,7 +305,14 @@ async def geocode_address(request: GeocodeRequest):
         # URL encode la dirección
         from urllib.parse import quote
         encoded_address = quote(address)
-        url = f"https://nominatim.openstreetmap.org/search?q={encoded_address}&format=json&limit=1&addressdetails=1"
+        result_limit = max(1, min(request.limit or 5, 10))
+        url = (
+            "https://nominatim.openstreetmap.org/search"
+            f"?q={encoded_address}"
+            "&format=json"
+            f"&limit={result_limit}"
+            "&addressdetails=1"
+        )
         
         # Hacer petición a Nominatim
         async with httpx.AsyncClient() as client:
@@ -317,23 +325,26 @@ async def geocode_address(request: GeocodeRequest):
             data = response.json()
         
         if not data or len(data) == 0:
-            raise HTTPException(
-                status_code=404, 
-                detail=f"No se encontró la dirección: {request.address}"
-            )
+            return {"resultados": []}
         
-        # Extraer información del primer resultado
-        result = data[0]
-        lat = float(result.get("lat", 0))
-        lon = float(result.get("lon", 0))
-        display_name = result.get("display_name", request.address)
+        resultados = []
+        for result in data:
+            lat = float(result.get("lat", 0))
+            lon = float(result.get("lon", 0))
+            display_name = result.get("display_name", request.address)
+            result_type = result.get("type")
+            importance = result.get("importance")
+            
+            resultados.append({
+                "latitud": lat,
+                "longitud": lon,
+                "direccion": display_name,
+                "direccion_original": request.address,
+                "tipo": result_type,
+                "importancia": importance
+            })
         
-        return {
-            "latitud": lat,
-            "longitud": lon,
-            "direccion": display_name,
-            "direccion_original": request.address
-        }
+        return {"resultados": resultados}
         
     except httpx.TimeoutException:
         raise HTTPException(status_code=504, detail="Timeout al geocodificar la dirección")

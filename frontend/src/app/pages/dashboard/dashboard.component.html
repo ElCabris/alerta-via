@@ -33,14 +33,18 @@
         <!-- Campos de direcciones -->
         <div class="input-group">
           <label for="originInput">📍 Origen</label>
-          <div class="input-with-button">
+          <div class="input-with-button suggestions-wrapper">
             <input 
               type="text" 
               id="originInput" 
               [(ngModel)]="originInput" 
               placeholder="Ej: Calle 50 #45-20, Medellín"
               class="form-input"
-              (keyup.enter)="geocodeOrigin()">
+              (ngModelChange)="onOriginInputChange($event)"
+              (focus)="onOriginInputFocus()"
+              (blur)="onOriginInputBlur()"
+              (keyup.enter)="geocodeOrigin()"
+              autocomplete="off">
             <button 
               class="search-btn" 
               (click)="geocodeOrigin()"
@@ -50,19 +54,33 @@
               <span *ngIf="isGeocodingOrigin">⏳</span>
             </button>
           </div>
+          <div class="suggestions-list" *ngIf="showOriginSuggestions">
+            <button 
+              type="button" 
+              class="suggestion-item" 
+              *ngFor="let suggestion of originSuggestions" 
+              (mousedown)="selectOriginSuggestion(suggestion)">
+              <span class="suggestion-main">{{ suggestion.direccion }}</span>
+              <span class="suggestion-sub" *ngIf="suggestion.tipo">{{ suggestion.tipo | titlecase }}</span>
+            </button>
+          </div>
           <small class="form-help" *ngIf="originAddress">{{ originAddress }}</small>
         </div>
 
         <div class="input-group">
           <label for="destinationInput">📍 Destino</label>
-          <div class="input-with-button">
+          <div class="input-with-button suggestions-wrapper">
             <input 
               type="text" 
               id="destinationInput" 
               [(ngModel)]="destinationInput" 
               placeholder="Ej: Parque Lleras, Medellín"
               class="form-input"
-              (keyup.enter)="geocodeDestination()">
+              (ngModelChange)="onDestinationInputChange($event)"
+              (focus)="onDestinationInputFocus()"
+              (blur)="onDestinationInputBlur()"
+              (keyup.enter)="geocodeDestination()"
+              autocomplete="off">
             <button 
               class="search-btn" 
               (click)="geocodeDestination()"
@@ -70,6 +88,16 @@
               title="Buscar dirección">
               <span *ngIf="!isGeocodingDestination">🔍</span>
               <span *ngIf="isGeocodingDestination">⏳</span>
+            </button>
+          </div>
+          <div class="suggestions-list" *ngIf="showDestinationSuggestions">
+            <button 
+              type="button" 
+              class="suggestion-item" 
+              *ngFor="let suggestion of destinationSuggestions" 
+              (mousedown)="selectDestinationSuggestion(suggestion)">
+              <span class="suggestion-main">{{ suggestion.direccion }}</span>
+              <span class="suggestion-sub" *ngIf="suggestion.tipo">{{ suggestion.tipo | titlecase }}</span>
             </button>
           </div>
           <small class="form-help" *ngIf="destinationAddress">{{ destinationAddress }}</small>

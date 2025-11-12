@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 export interface Point {
   latitud: number;
@@ -25,6 +25,15 @@ export interface RoutePredictionResponse {
   riesgo_alto_count: number;
   riesgo_medio_count: number;
   riesgo_bajo_count: number;
+}
+
+export interface GeocodeSuggestion {
+  latitud: number;
+  longitud: number;
+  direccion: string;
+  direccion_original: string;
+  tipo?: string;
+  importancia?: number;
 }
 
 @Injectable({
@@ -89,18 +98,10 @@ export class PredictionService {
   /**
    * Geocodifica una dirección a coordenadas
    */
-  geocodeAddress(address: string): Observable<{
-    latitud: number;
-    longitud: number;
-    direccion: string;
-    direccion_original: string;
-  }> {
-    return this.http.post<{
-      latitud: number;
-      longitud: number;
-      direccion: string;
-      direccion_original: string;
-    }>(`${this.apiUrl}/geocode`, { address });
+  geocodeAddress(address: string, limit: number = 5): Observable<GeocodeSuggestion[]> {
+    return this.http
+      .post<{ resultados: GeocodeSuggestion[] }>(`${this.apiUrl}/geocode`, { address, limit })
+      .pipe(map((response) => response.resultados ?? []));
   }
 }
 

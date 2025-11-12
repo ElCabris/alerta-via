@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { PredictionService, RouteRequest, RoutePredictionResponse, PointPrediction } from '../../services/prediction.service';
+import { PredictionService, RouteRequest, RoutePredictionResponse, PointPrediction, GeocodeSuggestion } from '../../services/prediction.service';
 
 // Declarar Leaflet para TypeScript
 declare var L: any;
@@ -38,6 +38,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   isGeocodingDestination: boolean = false;
   originAddress: string = '';  // Dirección formateada del origen
   destinationAddress: string = '';  // Dirección formateada del destino
+  originSuggestions: GeocodeSuggestion[] = [];
+  destinationSuggestions: GeocodeSuggestion[] = [];
+  showOriginSuggestions: boolean = false;
+  showDestinationSuggestions: boolean = false;
+
+  private originSearchTimeout: any = null;
+  private destinationSearchTimeout: any = null;
 
   // Variables para predicciones
   isLoadingPrediction: boolean = false;
@@ -65,6 +72,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     // Limpiar el mapa al destruir el componente
     if (this.map) {
       this.map.remove();
+    }
+
+    if (this.originSearchTimeout) {
+      clearTimeout(this.originSearchTimeout);
+    }
+
+    if (this.destinationSearchTimeout) {
+      clearTimeout(this.destinationSearchTimeout);
     }
   }
 
@@ -197,6 +212,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.originCoords = null;
     this.originInput = '';
     this.originAddress = '';
+    this.originSuggestions = [];
+    this.showOriginSuggestions = false;
     this.clearRoute();
   }
 
@@ -205,6 +222,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destinationCoords = null;
     this.destinationInput = '';
     this.destinationAddress = '';
+    this.destinationSuggestions = [];
+    this.showDestinationSuggestions = false;
     this.clearRoute();
   }
 
@@ -221,25 +240,23 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.predictionError = '';
 
     this.predictionService.geocodeAddress(this.originInput).subscribe({
-      next: (result) => {
-        this.originCoords = {
-          lat: result.latitud,
-          lng: result.longitud
-        };
-        this.originAddress = result.direccion;
-        
-        // Agregar marcador en el mapa
-        this.addOriginMarker(this.originCoords);
-        
-        // Centrar mapa en la ubicación encontrada
-        this.map.setView([result.latitud, result.longitud], 15);
-        
+      next: (results) => {
         this.isGeocodingOrigin = false;
-        this.clearRoute();
+
+        this.originSuggestions = results;
+        this.showOriginSuggestions = results.length > 0;
+
+        if (results.length === 0) {
+          this.predictionError = `No se encontraron direcciones similares para: ${this.originInput}`;
+          return;
+        }
+
+        // Seleccionar automáticamente el primer resultado, pero mantener visibles las sugerencias
+        this.applyOriginSuggestion(results[0], { centerMap: true, hideSuggestions: false });
       },
       error: (error) => {
         console.error('Error al geocodificar origen:', error);
-        this.predictionError = error.error?.detail || `No se pudo encontrar la dirección: ${this.originInput}`;
+        this.predictionError = error.error?.detail || `No se pudo buscar la dirección: ${this.originInput}`;
         this.isGeocodingOrigin = false;
       }
     });
@@ -258,28 +275,180 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.predictionError = '';
 
     this.predictionService.geocodeAddress(this.destinationInput).subscribe({
-      next: (result) => {
-        this.destinationCoords = {
-          lat: result.latitud,
-          lng: result.longitud
-        };
-        this.destinationAddress = result.direccion;
-        
-        // Agregar marcador en el mapa
-        this.addDestinationMarker(this.destinationCoords);
-        
-        // Centrar mapa en la ubicación encontrada
-        this.map.setView([result.latitud, result.longitud], 15);
-        
+      next: (results) => {
         this.isGeocodingDestination = false;
-        this.clearRoute();
+
+        this.destinationSuggestions = results;
+        this.showDestinationSuggestions = results.length > 0;
+
+        if (results.length === 0) {
+          this.predictionError = `No se encontraron direcciones similares para: ${this.destinationInput}`;
+          return;
+        }
+
+        // Seleccionar automáticamente el primer resultado, pero mantener visibles las sugerencias
+        this.applyDestinationSuggestion(results[0], { centerMap: true, hideSuggestions: false });
       },
       error: (error) => {
         console.error('Error al geocodificar destino:', error);
-        this.predictionError = error.error?.detail || `No se pudo encontrar la dirección: ${this.destinationInput}`;
+        this.predictionError = error.error?.detail || `No se pudo buscar la dirección: ${this.destinationInput}`;
         this.isGeocodingDestination = false;
       }
     });
+  }
+
+  onOriginInputChange(value: string) {
+    this.originInput = value;
+    this.originAddress = '';
+
+    if (this.originSearchTimeout) {
+      clearTimeout(this.originSearchTimeout);
+    }
+
+    if (!value.trim() || value.trim().length < 3) {
+      this.originSuggestions = [];
+      this.showOriginSuggestions = false;
+      return;
+    }
+
+    this.originSearchTimeout = setTimeout(() => {
+      this.fetchOriginSuggestions(value.trim());
+    }, 400);
+  }
+
+  onDestinationInputChange(value: string) {
+    this.destinationInput = value;
+    this.destinationAddress = '';
+
+    if (this.destinationSearchTimeout) {
+      clearTimeout(this.destinationSearchTimeout);
+    }
+
+    if (!value.trim() || value.trim().length < 3) {
+      this.destinationSuggestions = [];
+      this.showDestinationSuggestions = false;
+      return;
+    }
+
+    this.destinationSearchTimeout = setTimeout(() => {
+      this.fetchDestinationSuggestions(value.trim());
+    }, 400);
+  }
+
+  onOriginInputFocus() {
+    if (this.originSuggestions.length > 0) {
+      this.showOriginSuggestions = true;
+    }
+  }
+
+  onDestinationInputFocus() {
+    if (this.destinationSuggestions.length > 0) {
+      this.showDestinationSuggestions = true;
+    }
+  }
+
+  onOriginInputBlur() {
+    setTimeout(() => {
+      this.showOriginSuggestions = false;
+    }, 200);
+  }
+
+  onDestinationInputBlur() {
+    setTimeout(() => {
+      this.showDestinationSuggestions = false;
+    }, 200);
+  }
+
+  selectOriginSuggestion(suggestion: GeocodeSuggestion) {
+    this.predictionError = '';
+    this.applyOriginSuggestion(suggestion, { centerMap: true, hideSuggestions: true });
+  }
+
+  selectDestinationSuggestion(suggestion: GeocodeSuggestion) {
+    this.predictionError = '';
+    this.applyDestinationSuggestion(suggestion, { centerMap: true, hideSuggestions: true });
+  }
+
+  private fetchOriginSuggestions(query: string) {
+    this.predictionService.geocodeAddress(query).subscribe({
+      next: (results) => {
+        this.originSuggestions = results;
+        this.showOriginSuggestions = results.length > 0;
+      },
+      error: (error) => {
+        console.error('Error al obtener sugerencias de origen:', error);
+        this.originSuggestions = [];
+        this.showOriginSuggestions = false;
+      }
+    });
+  }
+
+  private fetchDestinationSuggestions(query: string) {
+    this.predictionService.geocodeAddress(query).subscribe({
+      next: (results) => {
+        this.destinationSuggestions = results;
+        this.showDestinationSuggestions = results.length > 0;
+      },
+      error: (error) => {
+        console.error('Error al obtener sugerencias de destino:', error);
+        this.destinationSuggestions = [];
+        this.showDestinationSuggestions = false;
+      }
+    });
+  }
+
+  private applyOriginSuggestion(
+    suggestion: GeocodeSuggestion,
+    options: { centerMap?: boolean; hideSuggestions?: boolean } = {}
+  ) {
+    const { centerMap = true, hideSuggestions = true } = options;
+
+    this.originCoords = {
+      lat: suggestion.latitud,
+      lng: suggestion.longitud
+    };
+    this.originAddress = suggestion.direccion;
+    this.originInput = suggestion.direccion;
+
+    this.addOriginMarker(this.originCoords);
+
+    if (centerMap && this.map) {
+      this.map.setView([suggestion.latitud, suggestion.longitud], 15);
+    }
+
+    if (hideSuggestions) {
+      this.showOriginSuggestions = false;
+      this.originSuggestions = [];
+    }
+
+    this.clearRoute();
+  }
+
+  private applyDestinationSuggestion(
+    suggestion: GeocodeSuggestion,
+    options: { centerMap?: boolean; hideSuggestions?: boolean } = {}
+  ) {
+    const { centerMap = true, hideSuggestions = true } = options;
+
+    this.destinationCoords = {
+      lat: suggestion.latitud,
+      lng: suggestion.longitud
+    };
+    this.destinationAddress = suggestion.direccion;
+    this.destinationInput = suggestion.direccion;
+
+    this.addDestinationMarker(this.destinationCoords);
+
+    if (centerMap && this.map) {
+      this.map.setView([suggestion.latitud, suggestion.longitud], 15);
+    }
+
+    if (hideSuggestions) {
+      this.showDestinationSuggestions = false;
+      this.destinationSuggestions = [];
+    }
+
+    this.clearRoute();
   }
 
   private originMarker: any = null;

@@ -1,7 +1,7 @@
 import gdown
 import os
 
-download_folder = "C:/Users/jhons/Desktop/ALERTA VIA MACHINE LEARNING"  
+download_folder = "C:/Users/jhons/Desktop/proyecto final paradigmas/ALERTA-VIA/modelo_ML"  
 
 files = {
     "hurtos_a_persona": "1VUXpxhpssv7pfZ1lupc0FMxBt2Pnvsp5",
