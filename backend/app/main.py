@@ -11,6 +11,8 @@ import os
 import httpx
 import pandas as pd
 from collections import Counter
+import asyncio
+import time
 
 app = FastAPI(
     title="Sistema de Predicción de Hurtos Medellín",
@@ -284,6 +286,10 @@ async def get_route_osrm(request: RouteRequestOSRM):
         raise HTTPException(status_code=500, detail=f"Error al obtener ruta: {str(e)}")
 
 
+# Variable global para controlar rate limiting de Nominatim
+_last_nominatim_request_time = 0
+_nominatim_min_delay = 1.0  # 1 segundo mínimo entre peticiones
+
 @app.post("/geocode")
 async def geocode_address(request: GeocodeRequest):
     """
@@ -295,12 +301,39 @@ async def geocode_address(request: GeocodeRequest):
     Returns:
         Diccionario con coordenadas (latitud, longitud) y nombre formateado
     """
+    global _last_nominatim_request_time
+    
     try:
+        # Rate limiting: esperar al menos 1 segundo desde la última petición
+        current_time = time.time()
+        time_since_last = current_time - _last_nominatim_request_time
+        if time_since_last < _nominatim_min_delay:
+            await asyncio.sleep(_nominatim_min_delay - time_since_last)
+        _last_nominatim_request_time = time.time()
+        
         # Construir URL de Nominatim API
         # Agregar "Medellín, Colombia" por defecto para mejorar resultados
         address = request.address.strip()
-        if not address.lower().endswith(('medellín', 'medellin', 'colombia')):
+        
+        # Mejorar búsqueda: agregar sinónimos comunes
+        address_lower = address.lower()
+        if not any(term in address_lower for term in ['medellín', 'medellin', 'colombia']):
             address = f"{address}, Medellín, Colombia"
+        
+        # Mejorar búsquedas comunes
+        address_replacements = {
+            'universidad de medellin': 'Universidad de Medellín, Medellín, Colombia',
+            'universidad de medellín': 'Universidad de Medellín, Medellín, Colombia',
+            'udea': 'Universidad de Antioquia, Medellín, Colombia',
+            'universidad nacional': 'Universidad Nacional de Colombia, Medellín, Colombia',
+            'parque lleras': 'Parque Lleras, El Poblado, Medellín, Colombia',
+            'centro comercial': 'Centro Comercial, Medellín, Colombia'
+        }
+        
+        for key, replacement in address_replacements.items():
+            if key in address_lower:
+                address = replacement
+                break
         
         # URL encode la dirección
         from urllib.parse import quote
@@ -312,19 +345,59 @@ async def geocode_address(request: GeocodeRequest):
             "&format=json"
             f"&limit={result_limit}"
             "&addressdetails=1"
+            "&countrycodes=co"  # Limitar a Colombia
         )
         
-        # Hacer petición a Nominatim
+        # Hacer petición a Nominatim con mejor manejo de errores
         async with httpx.AsyncClient() as client:
-            response = await client.get(
-                url, 
-                timeout=10.0,
-                headers={"User-Agent": "AlertaVia/1.0"}  # Nominatim requiere User-Agent
-            )
-            response.raise_for_status()
-            data = response.json()
+            try:
+                response = await client.get(
+                    url, 
+                    timeout=15.0,  # Aumentar timeout
+                    headers={
+                        "User-Agent": "AlertaVia/1.0 (contact: alertavia@example.com)"  # Nominatim requiere User-Agent válido
+                    },
+                    follow_redirects=True
+                )
+                
+                # Manejar rate limiting (429 Too Many Requests)
+                if response.status_code == 429:
+                    # Esperar un poco más y reintentar una vez
+                    await asyncio.sleep(2.0)
+                    response = await client.get(
+                        url, 
+                        timeout=15.0,
+                        headers={
+                            "User-Agent": "AlertaVia/1.0 (contact: alertavia@example.com)"
+                        },
+                        follow_redirects=True
+                    )
+                
+                response.raise_for_status()
+                data = response.json()
+                
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 429:
+                    raise HTTPException(
+                        status_code=429, 
+                        detail="Demasiadas peticiones. Por favor espera un momento antes de buscar otra dirección."
+                    )
+                elif e.response.status_code == 403:
+                    raise HTTPException(
+                        status_code=403,
+                        detail="Acceso denegado al servicio de geocodificación. Intenta más tarde."
+                    )
+                else:
+                    raise HTTPException(
+                        status_code=e.response.status_code,
+                        detail=f"Error del servicio de geocodificación: {e.response.status_code}"
+                    )
         
         if not data or len(data) == 0:
+            # Si no hay resultados, intentar sin agregar "Medellín, Colombia" si ya estaba incluido
+            if ", Medellín, Colombia" in address and request.address.strip() != address.replace(", Medellín, Colombia", "").strip():
+                # Ya intentamos con Medellín, retornar vacío
+                return {"resultados": []}
             return {"resultados": []}
         
         resultados = []
@@ -333,25 +406,44 @@ async def geocode_address(request: GeocodeRequest):
             lon = float(result.get("lon", 0))
             display_name = result.get("display_name", request.address)
             result_type = result.get("type")
-            importance = result.get("importance")
+            importance = result.get("importance", 0)
             
-            resultados.append({
-                "latitud": lat,
-                "longitud": lon,
-                "direccion": display_name,
-                "direccion_original": request.address,
-                "tipo": result_type,
-                "importancia": importance
-            })
+            # Filtrar resultados con coordenadas válidas
+            if lat != 0 and lon != 0:
+                resultados.append({
+                    "latitud": lat,
+                    "longitud": lon,
+                    "direccion": display_name,
+                    "direccion_original": request.address,
+                    "tipo": result_type,
+                    "importancia": importance
+                })
+        
+        # Ordenar por importancia (mayor a menor)
+        resultados.sort(key=lambda x: x.get("importancia", 0), reverse=True)
         
         return {"resultados": resultados}
         
     except httpx.TimeoutException:
-        raise HTTPException(status_code=504, detail="Timeout al geocodificar la dirección")
+        raise HTTPException(
+            status_code=504, 
+            detail="El servicio de geocodificación tardó demasiado. Intenta nuevamente."
+        )
     except httpx.RequestError as e:
-        raise HTTPException(status_code=503, detail=f"Error al conectar con el servicio de geocodificación: {str(e)}")
+        raise HTTPException(
+            status_code=503, 
+            detail=f"Error al conectar con el servicio de geocodificación. Verifica tu conexión a internet."
+        )
+    except HTTPException:
+        # Re-lanzar HTTPExceptions sin modificar
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al geocodificar dirección: {str(e)}")
+        # Log del error para depuración
+        print(f"Error inesperado al geocodificar '{request.address}': {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Error al geocodificar dirección. Intenta con una búsqueda más específica."
+        )
 
 
 # ============================================
